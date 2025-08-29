@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nguyễn Văn Thành Lợi – CTY TNHH Triều Lợi</title>
 
+  <!-- OpenGraph / Twitter giữ nguyên -->
   <meta property="og:title" content="Nguyễn Văn Thành Lợi – CTY TNHH Triều Lợi">
   <meta property="og:description" content="Kinh nghiệm chuyên sâu trong lĩnh vực phun phủ & xử lý bề mặt công nghiệp: tối ưu hiệu suất – an toàn – độ bền – chi phí.">
   <meta property="og:image" content="https://trieuloi1976.github.io/NguyenVanThanhLoi/image/Avatar.jpeg">
@@ -23,67 +24,102 @@
   <meta name="theme-color" content="#0f172a">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
     :root{
-      --tiltMax: 10;
-      --parallaxMax: 35;
-      --glow: 255,215,0;
+      /* hạ biên độ nghiêng xuống 0 (tắt xoay 3D), chỉ còn lắc nhẹ 2D */
+      --tiltMax: 0.0;
+      --parallaxMax: 10; /* parallax nhẹ dạng 2D */
     }
     body { font-family: 'Inter', sans-serif; }
-    .scene { perspective: 1500px; transform-style: preserve-3d; min-height: 100vh; position: relative; overflow-x: clip; }
-    .video-bg { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -3; transform: translateZ(-400px) scale(1.2); filter: saturate(1.1) contrast(1.05) brightness(0.8); background-color: #020617; }
-    .grid-3d { position: fixed; inset: 0; z-index: -2; background:
-      radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 60%) center/120% 120% no-repeat,
-      linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px) 0 0/ 60px 60px,
-      linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px) 0 0/ 60px 60px;
-      transform: translateZ(-200px);
-      mask-image: radial-gradient(circle at 50% 50%, #000 40%, transparent 85%);
-      animation: gridMove 20s linear infinite;
+    /* BỎ preserve-3d & translateZ để giảm layer compositing */
+    .scene { min-height: 100vh; position: relative; overflow-x: clip; }
+    /* Video nền: bỏ filter nặng & transform; dùng absolute thay fixed để giảm repaint */
+    .video-bg { position: absolute; inset: 0; z-index: -3; background:#020617; }
+    .video-bg video { width:100%; height:100%; object-fit:cover; }
+
+    /* Grid nền: tắt animation mặc định, chỉ bật trên desktop & khi không reduce-motion */
+    .grid-2d { position: absolute; inset: 0; z-index: -2; pointer-events:none;
+      background:
+        radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 60%) center/120% 120% no-repeat,
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px) 0 0/ 60px 60px,
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px) 0 0/ 60px 60px;
+      mask-image: radial-gradient(circle at 50% 50%, #000 45%, transparent 85%);
+      opacity: .6;
     }
-    @keyframes gridMove { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 60px 60px, 60px 60px, 60px 60px; } }
-    .overlay { background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(4px); min-height: 100vh; }
-    .card-3d { position: relative; transform-style: preserve-3d; transition: transform 400ms ease, box-shadow 400ms ease; box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), 0 0 28px rgba(var(--glow), 0.25); will-change: transform, box-shadow; }
-    .card-3d:hover { transform: rotateX(3deg) rotateY(-3deg) scale(1.02); box-shadow: 0 25px 50px rgba(0,0,0,0.65), 0 0 35px rgba(var(--glow), 0.35); }
-    .avatar-wrap { display: inline-grid; place-items: center; transform-style: preserve-3d; }
-    .avatar-img { border-radius: 9999px; width: 11rem; height: 11rem; object-fit: cover; box-shadow: 0 10px 22px rgba(0,0,0,0.6), 0 0 18px rgba(255, 193, 7, 0.55); transform: translateZ(45px); transition: transform 400ms ease, box-shadow 400ms ease; }
-    .avatar-img:hover { transform: translateZ(60px) scale(1.05) rotateY(5deg); box-shadow: 0 15px 30px rgba(0,0,0,0.7), 0 0 25px rgba(255, 193, 7, 0.75); }
-    .chip { transform-style: preserve-3d; transform: translateZ(50px) rotateX(1deg); box-shadow: 0 6px 14px rgba(0,0,0,0.45), inset 0 0 10px rgba(255,255,255,0.08); border: 1px solid rgba(148,163,184,0.35); background: linear-gradient(180deg, rgba(30,41,59,0.85), rgba(15,23,42,0.85)); transition: transform 300ms ease, box-shadow 300ms ease; }
-    .chip:hover { transform: translateZ(60px) rotateX(0deg) scale(1.05); box-shadow: 0 8px 16px rgba(0,0,0,0.55), inset 0 0 12px rgba(255,255,255,0.12); }
+    @media (prefers-reduced-motion: no-preference) and (min-width:1024px){
+      .grid-2d { animation: gridMove 40s linear infinite; }
+      @keyframes gridMove {
+        from { background-position: 0 0, 0 0, 0 0; }
+        to   { background-position: 60px 60px, 60px 60px, 60px 60px; }
+      }
+    }
+
+    /* Overlay: bỏ backdrop-filter (tốn GPU), dùng màu mờ */
+    .overlay { background: rgba(15, 23, 42, 0.5); min-height: 100vh; }
+
+    /* Card: bỏ box-shadow quá dày & hover rotate 3D, chỉ giữ scale nhẹ */
+    .card-lite {
+      transition: transform 250ms ease, box-shadow 250ms ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .card-lite:hover { transform: scale(1.01); box-shadow: 0 14px 28px rgba(0,0,0,0.45); }
+
+    /* Avatar: bỏ translateZ/rotateY; giữ hiệu ứng scale nhẹ */
+    .avatar-img { border-radius: 9999px; width: 11rem; height: 11rem; object-fit: cover;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+      transition: transform 250ms ease, box-shadow 250ms ease;
+    }
+    .avatar-img:hover { transform: scale(1.03); box-shadow: 0 12px 24px rgba(0,0,0,0.55); }
+
+    /* Chip: bỏ 3D & inset shadow nặng */
+    .chip {
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(30,41,59,0.8);
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+    .chip:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+    /* Parallax 2D nhẹ cho các phần tử có data-depth */
+    [data-depth]{ transform: translate3d(0,0,0); }
   </style>
 </head>
 <body class="text-slate-200 bg-slate-950">
-  <div class="video-bg">
-  <video
-    src="https://trieuloi1976.github.io/NguyenVanThanhLoi/image/Nen.mp4"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="auto"
-    style="width:100%;height:100%;object-fit:cover"
-  ></video>
-</div>
+  <div class="video-bg" aria-hidden="true">
+    <video
+      src="https://trieuloi1976.github.io/NguyenVanThanhLoi/image/Nen.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="https://trieuloi1976.github.io/NguyenVanThanhLoi/image/Avatar.jpeg"
+    ></video>
+  </div>
 
-  <div class="grid-3d"></div>
+  <div class="grid-2d" aria-hidden="true"></div>
 
   <div class="overlay scene" id="scene">
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-14">
-      <section id="card" class="card-3d rounded-3xl p-8 lg:p-12 bg-slate-900/70 border border-amber-500/40">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div class="lg:col-span-2 flex flex-col lg:flex-row lg:items-center lg:gap-10">
-            <div class="shrink-0 mx-auto lg:mx-0 avatar-wrap" data-depth="0.25">
-              <img src="https://trieuloi1976.github.io/NguyenVanThanhLoi/image/Avatar.jpeg" alt="Ảnh đại diện của Nguyễn Văn Thành Lợi" class="avatar-img" onerror="this.onerror=null;this.src='https://placehold.co/176x176/0f172a/fde047?text=LoiNVT';" />
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-14 content-visibility-auto">
+      <section id="card" class="card-lite rounded-3xl p-8 lg:p-12 bg-slate-900/70 border border-amber-500/30">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div class="lg:col-span-2 flex flex-col lg:flex-row lg:items-center lg:gap-8">
+            <div class="shrink-0 mx-auto lg:mx-0" data-depth="0.2">
+              <img loading="lazy" src="https://trieuloi1976.github.io/NguyenVanThanhLoi/image/Avatar.jpeg" alt="Ảnh đại diện của Nguyễn Văn Thành Lợi" class="avatar-img"
+                   onerror="this.onerror=null;this.src='https://placehold.co/176x176/0f172a/fde047?text=LoiNVT';" />
             </div>
 
             <div class="mt-6 lg:mt-0 text-center lg:text-left">
-              <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg">Nguyễn Văn Thành Lợi</h1>
-              <p class="text-lg font-semibold text-amber-300 mt-2 drop-shadow-md">Giám đốc • Founder Công ty TNHH Thiết Bị Công Nghệ Triều Lợi</p>
-              <p class="mt-4 text-slate-300 leading-relaxed drop-shadow-sm max-w-3xl"><strong>Kinh nghiệm chuyên sâu</strong> trong lĩnh vực <strong>phun phủ và xử lý bề mặt</strong> trên vật liệu công nghiệp: sắt, thép, gỗ, nhựa, đá hoa cương, v.v. Tối ưu hiệu suất – an toàn – độ bền – chi phí cho nhà máy.</p>
+              <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">Nguyễn Văn Thành Lợi</h1>
+              <p class="text-lg font-semibold text-amber-300 mt-2">Giám đốc • Founder Công ty TNHH Thiết Bị Công Nghệ Triều Lợi</p>
+              <p class="mt-4 text-slate-300 leading-relaxed max-w-3xl">
+                <strong>Kinh nghiệm chuyên sâu</strong> trong lĩnh vực <strong>phun phủ và xử lý bề mặt</strong> trên vật liệu công nghiệp:
+                sắt, thép, gỗ, nhựa, đá hoa cương, v.v. Tối ưu hiệu suất – an toàn – độ bền – chi phí cho nhà máy.
+              </p>
               <div class="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start">
                 <span class="chip px-3 py-1 rounded-full text-xs">Phun cát tuần hoàn</span>
                 <span class="chip px-3 py-1 rounded-full text-xs">Buồng phun không bụi</span>
@@ -94,90 +130,96 @@
             </div>
           </div>
 
-          <aside class="lg:col-span-1 space-y-3">
-            <a href="tel:+84982517317" class="flex items-center gap-3 rounded-xl border border-green-500/40 bg-green-500/10 hover:bg-green-500/20 p-3 shadow-md hover:shadow-lg" data-depth="0.12">
+          <aside class="lg:col-span-1 space-y-3" id="cta-wrap" data-depth="0.1">
+            <a href="tel:+84982517317" class="flex items-center gap-3 rounded-xl border border-green-500/40 bg-green-500/10 hover:bg-green-500/20 p-3 shadow-md">
               <i class="fa-solid fa-phone text-green-400 w-5 text-center"></i>
               <span class="text-sm">0982 517 317</span>
             </a>
-            <a href="mailto:trieuloi1976@gmail.com" class="flex items-center gap-3 rounded-xl border border-blue-400/40 bg-blue-400/10 hover:bg-blue-400/20 p-3 shadow-md hover:shadow-lg" data-depth="0.1">
+            <a href="mailto:trieuloi1976@gmail.com" class="flex items-center gap-3 rounded-xl border border-blue-400/40 bg-blue-400/10 hover:bg-blue-400/20 p-3 shadow-md">
               <i class="fa-solid fa-envelope text-blue-400 w-5 text-center"></i>
               <span class="text-sm">trieuloi1976@gmail.com</span>
             </a>
-            <a href="https://www.facebook.com/may.ban.bi.tl" target="_blank" class="flex items-center gap-3 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 p-3 shadow-md hover:shadow-lg" data-depth="0.08">
+            <a href="https://www.facebook.com/may.ban.bi.tl" target="_blank" class="flex items-center gap-3 rounded-xl border border-blue-500/40 bg-blue-500/10 hover:bg-blue-500/20 p-3 shadow-md">
               <i class="fa-brands fa-facebook text-blue-500 w-5 text-center"></i>
               <span class="text-sm">Facebook</span>
             </a>
-            <a href="https://zalo.me/0982517317" target="_blank" class="flex items-center gap-3 rounded-xl border border-cyan-400/40 bg-cyan-400/10 hover:bg-cyan-400/20 p-3 shadow-md hover:shadow-lg" data-depth="0.08">
-               <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <a href="https://zalo.me/0982517317" target="_blank" class="flex items-center gap-3 rounded-xl border border-cyan-400/40 bg-cyan-400/10 hover:bg-cyan-400/20 p-3 shadow-md">
+               <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <circle cx="12" cy="12" r="11.5" fill="#0068FF" stroke="#0068FF" stroke-width="1"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 7.5C5.5 6.39543 6.39543 5.5 7.5 5.5H16.5C17.6046 5.5 18.5 6.39543 18.5 7.5V13.5C18.5 14.6046 17.6046 15.5 16.5 15.5H10.5L6.5 18.5V15.5H7.5C6.39543 15.5 5.5 14.6046 5.5 13.5V7.5Z" fill="white"/>
                </svg>
               <span class="text-sm">Zalo</span>
             </a>
-            <a href="https://trieuloi.vn" target="_blank" class="flex items-center gap-3 rounded-xl border border-yellow-400/40 bg-yellow-400/10 hover:bg-yellow-400/20 p-3 shadow-md hover:shadow-lg" data-depth="0.06">
+            <a href="https://trieuloi.vn" target="_blank" class="flex items-center gap-3 rounded-xl border border-yellow-400/40 bg-yellow-400/10 hover:bg-yellow-400/20 p-3 shadow-md">
               <i class="fa-solid fa-globe text-yellow-400 w-5 text-center"></i>
               <span class="text-sm">trieuloi.vn</span>
             </a>
-            <a href="https://www.google.com/maps/search/?api=1&query=Cong+Ty+TNHH+Thiet+Bi+Cong+Nghe+Trieu+Loi" target="_blank" class="flex items-center gap-3 rounded-xl border border-red-400/40 bg-red-400/10 hover:bg-red-400/20 p-3 shadow-md hover:shadow-lg" data-depth="0.05">
+            <a href="https://www.google.com/maps/search/?api=1&query=Cong+Ty+TNHH+Thiet+Bi+Cong+Nghe+Trieu+Loi" target="_blank" class="flex items-center gap-3 rounded-xl border border-red-400/40 bg-red-400/10 hover:bg-red-400/20 p-3 shadow-md">
               <i class="fa-solid fa-location-dot text-red-400 w-5 text-center"></i>
               <span class="text-sm">Xem địa chỉ công ty</span>
             </a>
           </aside>
         </div>
 
-        <div class="mt-12 rounded-2xl border border-amber-400/50 bg-amber-400/10 p-6 text-center shadow-inner" data-depth="0.18">
+        <div class="mt-12 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-6 text-center" data-depth="0.05">
           <p class="text-xs uppercase text-slate-400 tracking-wider">Kinh nghiệm</p>
-          <p class="mt-2 text-3xl font-bold text-amber-300 drop-shadow-md">Hơn <span id="exp"></span> năm kinh nghiệm trong lĩnh vực phun phủ & xử lý bề mặt</p>
+          <p class="mt-2 text-3xl font-bold text-amber-300">Hơn <span id="exp"></span> năm kinh nghiệm trong lĩnh vực phun phủ & xử lý bề mặt</p>
         </div>
       </section>
 
-      <footer class="mt-8 text-center text-xs text-slate-400 drop-shadow-sm">© <span id="y"></span> Triều Lợi. All rights reserved.</footer>
+      <footer class="mt-8 text-center text-xs text-slate-400">© <span id="y"></span> Triều Lợi. All rights reserved.</footer>
     </main>
   </div>
 
   <script>
+    // Năm & số năm kinh nghiệm
     const currentYear = new Date().getFullYear();
     document.getElementById('y').textContent = currentYear;
     document.getElementById('exp').textContent = currentYear - 2012;
 
+    // Parallax 2D nhẹ, chỉ chạy khi:
+    // - Desktop (min-width:1024px)
+    // - Người dùng không bật reduce-motion
+    // - Chuột ở trong khu vực card
+    const supportsMatch = typeof window.matchMedia === 'function';
+    const reduce = supportsMatch && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isDesktop = supportsMatch ? window.matchMedia('(min-width:1024px)').matches : true;
+
     const scene = document.getElementById('scene');
     const card = document.getElementById('card');
-    let rafId = null;
+    let rafId = null, active = false;
 
-    function onMove(e){
-      const rect = scene.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top  + rect.height / 2;
-      const x = (e.clientX - cx) / (rect.width / 2);
-      const y = (e.clientY - cy) / (rect.height / 2);
-
-      const tiltX = (y * -1) * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tiltMax'));
-      const tiltY = x * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tiltMax'));
+    function onPointerMove(e){
+      if (!active) return;
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - (rect.left + rect.width/2)) / (rect.width/2);
+      const y = (e.clientY - (rect.top  + rect.height/2)) / (rect.height/2);
+      const max = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--parallaxMax')) || 10;
 
       if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-        const max = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--parallaxMax'));
-        document.querySelectorAll('[data-depth]').forEach(el => {
+      rafId = requestAnimationFrame(()=>{
+        // Parallax 2D cho các phần tử có data-depth
+        document.querySelectorAll('[data-depth]').forEach(el=>{
           const d = parseFloat(el.getAttribute('data-depth')) || 0.1;
           const tx = -x * max * d;
           const ty = -y * max * d;
-          el.style.transform = `translateZ(${Math.round(50*d)}px) translate(${tx}px, ${ty}px)`;
+          el.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
         });
       });
     }
 
-    function resetTilt(){
-      card.style.transform = 'rotateX(0deg) rotateY(0deg)';
-      document.querySelectorAll('[data-depth]').forEach(el => {
-        el.style.transform = `translateZ(${Math.round(50*(parseFloat(el.getAttribute('data-depth'))||0.1))}px) translate(0,0)`;
+    function onEnter(){ active = true; }
+    function onLeave(){
+      active = false;
+      document.querySelectorAll('[data-depth]').forEach(el=>{
+        el.style.transform = 'translate3d(0,0,0)';
       });
     }
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!prefersReduced){
-      window.addEventListener('mousemove', onMove);
-      scene.addEventListener('mouseleave', resetTilt);
+    if (!reduce && isDesktop){
+      card.addEventListener('pointerenter', onEnter, {passive:true});
+      card.addEventListener('pointermove', onPointerMove, {passive:true});
+      card.addEventListener('pointerleave', onLeave, {passive:true});
     }
   </script>
 </body>
